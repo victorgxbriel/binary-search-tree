@@ -20,14 +20,14 @@ class Tree{
             Node *right_son;
             int nodes_left;
             int nodes_right;
-            Node(T v=T{}, Node *n1 = nullptr, node *n2 = nullptr, int ns1 = 0, int ns2 = 0) : value{v}, left_son{n1}, right_son{n2}, nodes_left{ns1}, nodes_right{ns2}
+            Node(T v=T{}, Node *n1 = nullptr, Node *n2 = nullptr, int ns1 = 0, int ns2 = 0) : value{v}, left_son{n1}, right_son{n2}, nodes_left{ns1}, nodes_right{ns2}
             {/*empty*/}
         };
         Node *m_root;
     public:
         // === Metodos regulares da classe da arvore.
         /// Construtor padrão.
-        Tree() : m_root{new Node}
+        Tree() : m_root{nullptr}
         {
             /*
             m_root = new Node; // nó raiz

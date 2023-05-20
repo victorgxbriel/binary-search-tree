@@ -239,7 +239,14 @@ void arquivonos(std::string namefile, edb::Tree<int> & t){
 }
 
 void console(edb::Tree<int> & t){
-
+    std::string input, msg;
+    std::getline(std::cin, input);
+    while(input != "-exit"){
+        std::vector<std::string> comands = split(input);
+        function_e func = what_function(comands[0]);
+        auto result = result_function(func, comands, t, msg);
+        std::cout << msg << std::endl;
+    }
 }
 
 void imprime_funcoes(){
