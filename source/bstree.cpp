@@ -69,7 +69,7 @@ namespace edb{
                 } else if(m_root->left_son == nullptr){
 
                 } else {
-                    
+
                 }
             }
         }

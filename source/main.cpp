@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <exception>
 
 #include "bstree.h"
 
@@ -164,7 +165,8 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 msg = "Operação invalida, está faltando informação ou tem a mais";
             } else {
                 int value = std::stoi(comands[1]);
-                t.insere(value);
+                //result = t.insert(value);
+                result = t.insere(value);
                 if(result == -1)
                     msg = std::to_string(value) + " já está na árvore, não pode ser adicionada";
                 else
@@ -246,6 +248,7 @@ void console(edb::Tree<int> & t){
         function_e func = what_function(comands[0]);
         auto result = result_function(func, comands, t, msg);
         std::cout << msg << std::endl;
+        std::getline(std::cin, input);
     }
 }
 
