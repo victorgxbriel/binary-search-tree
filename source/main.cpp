@@ -125,7 +125,8 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 msg = "A árvore não é completa";
             break;
         case function_e::PREORDEM:
-            msg =  t.pre_ordem();
+            auto root = t.getRoot();
+            msg =  t.pre_ordem(root);
             break;
         case function_e::IMPRIME:
             if(comands.size() != 2){

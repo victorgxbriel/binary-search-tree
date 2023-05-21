@@ -24,6 +24,7 @@ class Tree{
             {/*empty*/}
         };
         Node *m_root;
+        std::string seq_pre_ordem;
     public:
         // === Metodos regulares da classe da arvore.
         /// Construtor padrão.
@@ -58,7 +59,7 @@ class Tree{
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria completa e falso, caso contrario.
         bool eh_completa();
         /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
-        std::string pre_ordem();
+        std::string pre_ordem(Node& root);
         /// Caso m = 1, imprime a arvore de acordo com o metodo 1, se m = 2, imprime a arvore de acordo com o metodo 2.
         std::string imprime_arvore(int m);
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
@@ -67,6 +68,18 @@ class Tree{
         bool busca(const T & value);
         /// Insere um nó na arvore com o valor passado, caso já esteja na arvore retorna -1.
         int insere(const T & value);
+
+        Node getRoot() {
+            return m_root;
+        }
+
+        void setSeq_pre_ordem(std::string preOrdemString) {
+            seq_pre_ordem = preOrdemString;
+        }
+
+        std::string getSeq_pre_ordem() {
+            return seq_pre_ordem;
+        }
 
 };
 }

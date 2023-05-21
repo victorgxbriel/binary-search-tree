@@ -40,8 +40,14 @@ namespace edb{
     }
 
     template<typename T>
-    std::string Tree<T>::pre_ordem(){
+    std::string Tree<T>::pre_ordem(Node& root){
+        if(!root) return "";
 
+        setSeq_pre_ordem(getSeq_pre_ordem() + to_string(root->value) + " ");
+        pre_ordem(root->left_son);
+        pre_ordem(root->right_son)
+
+        return getSeq_pre_ordem();
     }
 
     template<typename T>
