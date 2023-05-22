@@ -80,6 +80,9 @@ class Tree{
         std::string imprime_arvore(int m){
             return 0;
         }
+        T sucessor(const T & value){
+            
+        }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
         int remove(const T & value){
             return 0;
@@ -105,37 +108,35 @@ class Tree{
             }
         }
         /// auxilar da recursão
-        Node* aux(Node* a, const T & value){
+        Node * aux(Node * a, const T & value){
+            if(a == nullptr){
+                a = new Node;
+                a->value = value;
+                return a;
+            }
             // Vai pra esquerda
             if(a->value > value){
-                if(a->left_son == nullptr){
-                    a->nodes_left++;
-                    return a->left_son;
-                } else 
-                    a = aux(a->left_son, value);
-                
+                a->left_son = aux(a->left_son, value);
+                a->nodes_left++;
             } else if(a->value < value){
-                if(a->right_son == nullptr){
-                    a->nodes_right++;
-                    return a->right_son;
-                } else 
-                    a = aux(a->right_son, value);
-            } else {
+                a->right_son = aux(a->right_son, value);
+                a->nodes_right++;
+            } else if(a->value == value)
                 return nullptr;
-            }
         }
         /// Teste de inserção por recursão
         int insert(const T & value){
-            Node *newnode = new Node;
-            newnode->value = value;
+            Node *newnode;
             if(m_root == nullptr){
+                newnode = new Node;
+                newnode->value = value;
                 m_root = newnode;
             } else {
                 newnode = aux(m_root, value);
-                if(newnode ==  nullptr)
+                if(newnode != m_root)
                     return -1;
             }
-            return newnode->value;
+            return value;
         }
         /// Insere um nó na arvore com o valor passado, caso já esteja na arvore retorna -1.
         int insere(const T & value){
