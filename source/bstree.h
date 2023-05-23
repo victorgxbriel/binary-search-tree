@@ -59,11 +59,43 @@ class Tree{
         }
         /// Retorna a posição do nó que contem a mediana da arvore. Se a arvore tiver um número par de nós, retorna o que tiver menor valor.
         int mediana(){
-            return 0;
+            int qtd = m_root->nodes_left + m_root->nodes_right + 1;
+            // Verifica se a quantidade de nós da arvore é impar ou par
+            if(qtd % 2 == 0){
+                // Retornar o menor elemento entre os dois
+            } else {
+
+            }
+        }
+        /// Retorna a soma de todos os nós, a esquerda se direction = true, direita caso contrario, a partir da raiz.
+        double soma(const Node * root, bool direction){
+            if(root == nullptr){
+                return 0;
+            }
+            if(direction){
+                return root->value + soma(root->left_son, true);
+            } else {
+                return root->value + soma(root->right_son, false);
+            }
+
         }
         /// Rertorna a media aritmetica dos valores dos nós da arvore tem como nó raiz o valor value, e -1 caso não contenha o valor na arvore.
         double media(const T & value){
-            return 0;
+            Node *var;
+            if(m_root != nullptr){
+                var = m_root;
+                while(true){
+                    if(var == nullptr)
+                        return -1;
+                    if(var->value == value){
+                        return (soma(var, false) + soma(var, true) - value) / (var->nodes_left + var->nodes_right + 1);
+                    } else if(var->value > value){
+                        var = var->left_son;
+                    } else if(var->value < value){
+                        var = var->right_son;
+                    }
+                }   
+            }
         }
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria cheia e falso, caso contrario.
         bool eh_cheia(){
@@ -73,16 +105,30 @@ class Tree{
         bool eh_completa(){
             return 0;
         }
-        /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
-        std::string pre_ordem(Node& root){
-            return 0;
+
+        std::string aux_preordem(const Node * root){
+            if(!root) return "";
+
+            setSeq_pre_ordem(getSeq_pre_ordem() + std::to_string(root->value) + " ");
+            aux_preordem(root->left_son);
+            aux_preordem(root->right_son);
+
+            return getSeq_pre_ordem();
         }
+
+        std::string pre_ordem(){
+            if(m_root != nullptr){
+                std::string ret = aux_preordem(m_root);
+                seq_pre_ordem.clear();
+                return ret;
+            }
+            return "";
+        }
+        /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
+        
         /// Caso m = 1, imprime a arvore de acordo com o metodo 1, se m = 2, imprime a arvore de acordo com o metodo 2.
         std::string imprime_arvore(int m){
             return 0;
-        }
-        T sucessor(const T & value){
-            
         }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
         int remove(const T & value){
@@ -108,72 +154,53 @@ class Tree{
                 }
             }
         }
-        /// auxilar da recursão
-        Node * aux(Node * a, const T & value){
-            if(a == nullptr){
-                a = new Node;
-                a->value = value;
-                return a;
+        /// Função auxiliar a insert. Retorna true, caso a inserção for em sucessida, e false caso contrario(Valor já está na arvore).
+        bool var_insert(Node * root, Node * newnode){
+            if(newnode->value == root->value){
+                return false;
             }
-            // Vai pra esquerda
-            if(a->value > value){
-                a->left_son = aux(a->left_son, value);
-                a->nodes_left++;
-            } else if(a->value < value){
-                a->right_son = aux(a->right_son, value);
-                a->nodes_right++;
-            } else if(a->value == value)
-                return nullptr;
-        }
-        /// Teste de inserção por recursão
-        int insert(const T & value){
-            Node *newnode;
-            if(m_root == nullptr){
-                newnode = new Node;
-                newnode->value = value;
-                m_root = newnode;
-            } else {
-                newnode = aux(m_root, value);
-                if(newnode != m_root)
-                    return -1;
+            if(newnode->value > root->value){
+                if(!root->right_son){
+                    root->right_son = newnode;
+                    root->nodes_right++;
+                    return true;
+                } else {
+                    if(var_insert(root->right_son, newnode))
+                        root->nodes_right++;
+                }
+            } else if(newnode->value < root->value){
+                if(!root->left_son){
+                    root->left_son = newnode;
+                    root->nodes_left++;
+                    return true;
+                } else {
+                    if(var_insert(root->left_son, newnode))
+                        root->nodes_left++;
+                }
             }
-            return value;
         }
         /// Insere um nó na arvore com o valor passado, caso já esteja na arvore retorna -1.
-        int insere(const T & value){
+        int insert(const T & value){
+            bool flag;
             Node *newnode = new Node;
             newnode->value = value;
-            if(m_root != nullptr){
-                Node *var = new Node;
-                var = m_root;
-                while(true){
-                    if(var->value == value){
-                        return -1;
-                    } else if(var->value > value){
-                        var->nodes_left++;
-                        if(var->left_son == nullptr){
-                            var->left_son = newnode;
-                            return var->left_son->value;
-                            //return newnode->value;
-                        } else {
-                            var = var->left_son;
-                        }
-                    } else if(var->value < value){
-                        var->nodes_right++;
-                        if(var->right_son == nullptr){
-                            var->right_son = newnode;
-                            return var->right_son->value;
-                        } else {
-                            var = var->right_son;
-                        }
-                    } 
-                }
-            } else {
+            if(m_root == nullptr){
                 m_root = newnode;
-                return m_root->value;
+                flag = true;
+            } else {
+                flag = var_insert(m_root, newnode);
+                /*
+                newnode = aux_insert(m_root, value);
+                if(newnode != m_root)
+                    return -1;
+                */
             }
+            if(flag)
+                return value;
+            else
+                return -1;
         }
-
+        
         Node getRoot() {
             return m_root;
         }

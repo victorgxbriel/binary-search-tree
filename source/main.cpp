@@ -20,8 +20,26 @@ enum class function_e : short{
         REMOVA,
         BUSCA,
         INSERE,
+        HELP,
         ERRO
 };
+
+void imprime_funcoes(){
+    std::cout << "ENESIMO N\n"
+              << "POSICAO N\n"
+              << "MEDIANA\n"
+              << "MEDIA N\n"
+              << "CHEIA\n"
+              << "COMPLETA\n"
+              << "PREORDEM\n"
+              << "IMPRIMA S\n"
+              << "REMOVA N\n"
+              << "BUSCAR N\n"
+              << "INSIRA N\n"
+              << "Para mais informações, acesse o codigo fonte do arquivo \"tree.h\"\n"
+              << "você pode voltar a ver o padrão acima digitando \"-help\",e para parar a execução \"-exit\"(apenas pelo console)\n"
+              << "Esse foi um trabalho academico feito por Victor Gabriel e Daniel Lucas\n";
+}
 
 std::vector<std::string> split(const std::string & input_str, char delimiter = ' '){
     std::vector<std::string> tokens;
@@ -64,6 +82,8 @@ function_e what_function(const std::string & str){
         return function_e::BUSCA;
     else if(STR_UPPERCASE(str) == "INSIRA")
         return function_e::INSERE;
+    else if(STR_UPPERCASE(str) == "-HELP")
+        return function_e::HELP;
     else
         return function_e::ERRO;
 }
@@ -126,8 +146,8 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 msg = "A árvore não é completa";
             break;
         case function_e::PREORDEM:
-            auto root = t.getRoot();
-            msg =  t.pre_ordem(root);
+            //auto root = t.getRoot();
+            msg =  t.pre_ordem();
             break;
         case function_e::IMPRIME:
             if(comands.size() != 2){
@@ -166,13 +186,16 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 msg = "Operação invalida, está faltando informação ou tem a mais";
             } else {
                 int value = std::stoi(comands[1]);
-                //result = t.insert(value);
-                result = t.insere(value);
+                result = t.insert(value);
+                //result = t.insere(value);
                 if(result == -1)
                     msg = std::to_string(value) + " já está na árvore, não pode ser adicionada";
                 else
                     msg = std::to_string(result) + " adicionado";
             }
+            break;
+        case function_e::HELP:
+            imprime_funcoes();
             break;
         case function_e::ERRO:
             msg =  "Erro";
@@ -227,7 +250,7 @@ void arquivonos(std::string namefile, edb::Tree<int> & t){
         std::vector<std::string> nodes = split(str);
         for(int i = 0; i < nodes.size(); i++){
             try{
-                t.insere(std::stoi(nodes[i]));
+                t.insert(std::stoi(nodes[i]));
             }
             catch(const std::exception& e) {
                 std::cerr << "Erro: argumento invalido. " << e.what() << '\n';
@@ -243,31 +266,18 @@ void arquivonos(std::string namefile, edb::Tree<int> & t){
 
 void console(edb::Tree<int> & t){
     std::string input, msg;
+    std::cout << "\n\nDigite a função: \n";
     std::getline(std::cin, input);
     while(input != "-exit"){
         std::vector<std::string> comands = split(input);
         function_e func = what_function(comands[0]);
         auto result = result_function(func, comands, t, msg);
         std::cout << msg << std::endl;
+        std::cout << "\nDigite a função: (-help para caso queira saber as funções)\n";
         std::getline(std::cin, input);
     }
 }
 
-void imprime_funcoes(){
-    std::cout << "ENESIMO N\n"
-              << "POSICAO N\n"
-              << "MEDIANA\n"
-              << "MEDIA\n"
-              << "CHEIA\n"
-              << "COMPLETA\n"
-              << "IMPRIMA S\n"
-              << "REMOVA N\n"
-              << "BUSCAR N\n"
-              << "INSIRA N\n"
-              << "Para mais informações, acesse o codigo fonte do arquivo \"tree.h\"\n"
-              << "você pode voltar a ver o padrão acima digitando \"-help\",e para parar a execução \"-exit\"(apenas pelo console)\n"
-              << "Esse foi um trabalho academico feito por Victor Gabriel e Daniel Lucas\n";
-}
 
 int main(int argc, char **argv){
     edb::Tree<int> t;
