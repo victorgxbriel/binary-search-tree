@@ -144,9 +144,39 @@ class Tree{
         std::string imprime_arvore(int m){
             return 0;
         }
+        bool aux_remove(Node * root, Node * node, const T & value){
+            if(node == nullptr){
+                return false;
+            }
+            if(value > node->value){
+                aux_remove(node, node->right_son, value);
+            }else if(value < node->value){
+                aux_remove(node, node->left_son, value);
+            } else {
+                // folha
+                if(node->left_son == nullptr and node->right_son == nullptr){
+                    delete node;
+                // tem ao menos um filho
+                } else if(node->left_son == nullptr){
+                    root = node->right_son;
+                    delete node;
+                } else if(node->right_son == nullptr){
+                    root = node->left_son;
+                    delete node;
+                // tem dois filhos
+                } else {
+
+                }
+            }
+
+        }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
         int remove(const T & value){
-            return 0;
+            bool flag;
+            if(m_root != nullptr){
+                Node * node = m_root;
+                flag = aux_remove(m_root, node, value);
+            }
         }
         /// Retorna o nó caso esteja na arvora, e -1, caso contrario.
         bool busca(const T & value){
@@ -169,7 +199,7 @@ class Tree{
             }
         }
         /// Função auxiliar a insert. Retorna true, caso a inserção for em sucessida, e false caso contrario(Valor já está na arvore).
-        bool var_insert(Node * root, Node * newnode, int & h){
+        bool var_insert(Node * root, Node * newnode, int & h, bool & att){
             if(newnode->value == root->value){
                 return false;
             }
@@ -180,12 +210,15 @@ class Tree{
                     root->right_son = newnode;
                     root->nodes_right++;
                     root->heigth_rigth = newnode->heigth;
-                    if(root->heigth_left < root->heigth_rigth)
+                    if(root->heigth_left < root->heigth_rigth){
                         root->heigth = root->heigth_rigth + h;
+                        att = true;
+                    }
                     return true;
                 } else {
-                    if(var_insert(root->right_son, newnode, h)){
-                        root->heigth_rigth += h;
+                    if(var_insert(root->right_son, newnode, h, att)){
+                        if(att)
+                            root->heigth_rigth += h;
                         if(root->heigth_left < root->heigth_rigth)
                             root->heigth = root->heigth_rigth+ h;
                         root->nodes_right++;
@@ -198,12 +231,15 @@ class Tree{
                     root->left_son = newnode;
                     root->nodes_left++;
                     root->heigth_left = newnode->heigth;
-                    if(root->heigth_left > root->heigth_rigth)
+                    if(root->heigth_left > root->heigth_rigth){
                         root->heigth = root->heigth_left + h;
+                        att = true;
+                    }
                     return true;
                 } else {
-                    if(var_insert(root->left_son, newnode, h)){
-                        root->heigth_left += h;
+                    if(var_insert(root->left_son, newnode, h, att)){
+                        if(att)
+                            root->heigth_left += h;
                         if(root->heigth_left > root->heigth_rigth)
                             root->heigth = root->heigth_left + h;
                     }
@@ -222,7 +258,9 @@ class Tree{
             } else {
                 int v = 0;
                 int& h = v;
-                flag = var_insert(m_root, newnode, h);
+                bool x = false;
+                bool& att = x;
+                flag = var_insert(m_root, newnode, h, att);
                 /*
                 newnode = aux_insert(m_root, value);
                 if(newnode != m_root)
