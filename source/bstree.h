@@ -8,6 +8,7 @@
 */
 
 #include <string>
+#include <cmath>
 
 namespace edb{
 /// Instancia de uma arvore de busca binaria.
@@ -20,7 +21,11 @@ class Tree{
             Node *right_son;
             int nodes_left;
             int nodes_right;
-            Node(T v=T{}, Node *n1 = nullptr, Node *n2 = nullptr, int ns1 = 0, int ns2 = 0) : value{v}, left_son{n1}, right_son{n2}, nodes_left{ns1}, nodes_right{ns2}
+            int heigth_rigth;
+            int heigth_left;
+            int heigth;
+            int nivel;
+            Node(T v=T{}, Node *n1 = nullptr, Node *n2 = nullptr, int ns1 = 0, int ns2 = 0, int h = 1, int hr = 0, int hl = 0, int nivel = 0) : value{v}, left_son{n1}, right_son{n2}, nodes_left{ns1}, nodes_right{ns2}, heigth{h}, heigth_left{hl}, heigth_rigth{hr}, nivel{nivel}
             {/*empty*/}
         };
         Node *m_root;
@@ -99,11 +104,20 @@ class Tree{
         }
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria cheia e falso, caso contrario.
         bool eh_cheia(){
-            return 0;
+            int qtd_nos = m_root->nodes_left + m_root->nodes_right + 1;
+            int cheia_nos = std::pow(2, m_root->heigth) - 1;
+            if(qtd_nos == cheia_nos)
+                return true;
+            return false;
         }
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria completa e falso, caso contrario.
         bool eh_completa(){
-            return 0;
+            int qtd_nos = m_root->nodes_left + m_root->nodes_right + 1;
+            int min_nos = std::pow(2, m_root->heigth - 1);
+            int max_nos = std::pow(2, m_root->heigth) - 1;
+            if((min_nos <= qtd_nos) and (qtd_nos <= max_nos))
+                return true;
+            return false;
         }
 
         std::string aux_preordem(const Node * root){
@@ -155,26 +169,44 @@ class Tree{
             }
         }
         /// Função auxiliar a insert. Retorna true, caso a inserção for em sucessida, e false caso contrario(Valor já está na arvore).
-        bool var_insert(Node * root, Node * newnode){
+        bool var_insert(Node * root, Node * newnode, int & h){
             if(newnode->value == root->value){
                 return false;
             }
+            // direita
             if(newnode->value > root->value){
                 if(!root->right_son){
+                    h = 1;
                     root->right_son = newnode;
                     root->nodes_right++;
+                    root->heigth_rigth = newnode->heigth;
+                    if(root->heigth_left < root->heigth_rigth)
+                        root->heigth = root->heigth_rigth + h;
                     return true;
                 } else {
-                    if(var_insert(root->right_son, newnode))
+                    if(var_insert(root->right_son, newnode, h)){
+                        root->heigth_rigth += h;
+                        if(root->heigth_left < root->heigth_rigth)
+                            root->heigth = root->heigth_rigth+ h;
                         root->nodes_right++;
+                    }
                 }
+                // esquerda
             } else if(newnode->value < root->value){
                 if(!root->left_son){
+                    h = 1;
                     root->left_son = newnode;
                     root->nodes_left++;
+                    root->heigth_left = newnode->heigth;
+                    if(root->heigth_left > root->heigth_rigth)
+                        root->heigth = root->heigth_left + h;
                     return true;
                 } else {
-                    if(var_insert(root->left_son, newnode))
+                    if(var_insert(root->left_son, newnode, h)){
+                        root->heigth_left += h;
+                        if(root->heigth_left > root->heigth_rigth)
+                            root->heigth = root->heigth_left + h;
+                    }
                         root->nodes_left++;
                 }
             }
@@ -188,7 +220,9 @@ class Tree{
                 m_root = newnode;
                 flag = true;
             } else {
-                flag = var_insert(m_root, newnode);
+                int v = 0;
+                int& h = v;
+                flag = var_insert(m_root, newnode, h);
                 /*
                 newnode = aux_insert(m_root, value);
                 if(newnode != m_root)
