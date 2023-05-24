@@ -46,7 +46,7 @@ namespace edb{
     }
 
     template<typename T>
-    std::string Tree<T>::pre_ordem(Node& root){
+    std::string Tree<T>::pre_ordem(){
         if(!root) return "";
 
         setSeq_pre_ordem(getSeq_pre_ordem() + to_string(root->value) + " ");
@@ -107,7 +107,7 @@ namespace edb{
     }
 
     template<typename T>
-    int Tree<T>::insere(const T& value){
+    int Tree<T>::insert(const T& value){
         Node *newnode = new Node;
         newnode->value = value;
         if(m_root != nullptr){

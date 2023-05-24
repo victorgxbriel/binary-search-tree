@@ -53,11 +53,41 @@ class Tree{
         void clear(){
 
         }
+
         /// Retorna o n-esimo elemento(contando a partir de 1) do percurso em ordem(ordem simetrica) da arvore, retorna -1 caso o n for maior que o número de nós da arvore.
-        int enesimo_elemento(int n){
-            // e
-            return 0;
+        int aux_enesimo_elemento(Node *root, int n){
+            if((n > (root->nodes_left + root->nodes_right + 1)) || (n <= 0)){
+                return -1;
+            }
+            int aux = n;
+            if (root->nodes_left + 1 > aux){ //comparação entre o n e a quantidade de nós a esquerda mais o nó  raiz               
+
+                root = root->left_son;
+                aux_enesimo_elemento(root, aux);
+                
+
+            } else if (root->nodes_left + 1 == aux){ //se n for igual a quantidade de nós a esquerda mais 1, então o n = raiz
+
+                return root->value;
+
+            } else {
+
+                aux = aux - root->nodes_left - 1;
+                root = root->right_son;
+                aux_enesimo_elemento(root, aux);
+
+            }
+        
         }
+
+        int enesimo_elemento(int n){
+            if(m_root != nullptr){
+                int enesimo = aux_enesimo_elemento(m_root, n);
+                return enesimo;
+            }
+            return -1;
+        }
+
         /// Retorna a posição do nó que contem o valor x em um percurso em ordem simetrica na arvore(contando a partir de 1), retorna -1 caso não esteja na arvore.
         int posicao(const T & value){
             return 0;

@@ -98,7 +98,7 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 int n = std::stoi(comands[1]);
                 result =  t.enesimo_elemento(n);
                 if(result == -1)
-                    msg = "O número n é maior que o número de nós da arvore";
+                    msg = "O número n é menor do que 1 ou maior que o número de nós da arvore";
                 else
                     msg = std::to_string(result);
             }
