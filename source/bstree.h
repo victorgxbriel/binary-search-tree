@@ -144,39 +144,118 @@ class Tree{
         std::string imprime_arvore(int m){
             return 0;
         }
-        bool aux_remove(Node * root, Node * node, const T & value){
+        /// Função recursiva auxiliar a atualiza altura.
+        int altura(Node *& node){
+            if(node == nullptr)
+                return 0;
+            if(node->right_son == nullptr and node->left_son == nullptr){
+                return node->heigth = 1;
+            }
+            int esquerda = altura(node->left_son);
+            int direita = altura(node->right_son);
+            node->heigth_left = esquerda;
+            node->heigth_rigth = direita;
+            if(esquerda > direita)
+                node->heigth = esquerda + 1;
+            else
+                node->heigth = direita + 1;
+            return node->heigth;
+        }
+        void att_altura_completa(){
+            m_root->heigth_left = altura(m_root->left_son);
+            m_root->heigth_rigth = altura(m_root->right_son);
+
+            if(m_root->heigth_left > m_root->heigth_rigth)
+                m_root->heigth = m_root->heigth_left + 1;
+            else
+                m_root->heigth = m_root->heigth_rigth + 1;
+        }
+        /// Função para calcular a altura da arvore, true para esquerda, false para direita
+        void att_altura(bool dir){
+            if(dir)
+                m_root->heigth_left = altura(m_root->left_son);
+            else 
+                m_root->heigth_rigth = altura(m_root->right_son);
+
+            if(m_root->heigth_left > m_root->heigth_rigth)
+                m_root->heigth = m_root->heigth_left + 1;
+            else
+                m_root->heigth = m_root->heigth_rigth + 1;
+        }
+        /// Função recursiva auxiliar a remoção
+        bool aux_remove(Node *& node, const T& value){
             if(node == nullptr){
                 return false;
             }
             if(value > node->value){
-                aux_remove(node, node->right_son, value);
-            }else if(value < node->value){
-                aux_remove(node, node->left_son, value);
+                if(aux_remove(node->right_son, value)){
+                    node->nodes_right--;
+                    if(node->heigth_rigth < node->heigth_left)
+                        node->heigth = node->heigth_left + 1;
+                    else 
+                        node->heigth = node->heigth_rigth + 1;
+                }
+            } else if(value < node->value){
+                if(aux_remove(node->left_son, value)){
+                    node->nodes_left--;
+                    if(node->heigth_left < node->heigth_rigth)
+                        node->heigth = node->heigth_rigth + 1;
+                    else
+                        node->heigth = node->heigth_left + 1;
+                }
             } else {
-                // folha
                 if(node->left_son == nullptr and node->right_son == nullptr){
+                // Caso 1 : folha
                     delete node;
-                // tem ao menos um filho
+                    node = nullptr;
                 } else if(node->left_son == nullptr){
-                    root = node->right_son;
-                    delete node;
+                // Caso 2 : um filho a direita
+                    Node * temp = node;
+                    node = node->right_son;
+                    delete temp;
                 } else if(node->right_son == nullptr){
-                    root = node->left_son;
-                    delete node;
-                // tem dois filhos
+                // Caso 2: um filho a esquerda
+                    Node * temp = node;
+                    node = node->left_son;
+                    delete temp;
                 } else {
-
+                // Caso 3: 2 filhos
+                // Procurar pelo menor da subarvore da direita, i.e., andar pra esquerda na sub arvore da direita
+                    Node * curr = node;
+                    Node * minrigh = node->right_son;
+                    while(minrigh->left_son != nullptr){
+                        curr = minrigh; 
+                        minrigh = minrigh->left_son;
+                    }
+                    curr->value = minrigh->value;
+                    if(curr == node)
+                        node->right_son = minrigh->right_son;
+                    else
+                        node->left_son = minrigh->right_son;
+                    delete minrigh;
                 }
             }
-
+            return true;
+            
         }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
         int remove(const T & value){
             bool flag;
             if(m_root != nullptr){
                 Node * node = m_root;
-                flag = aux_remove(m_root, node, value);
+                flag = aux_remove(m_root, value);
             }
+            if(flag and m_root != nullptr){
+                if(value == m_root->value)
+                    att_altura_completa();
+                else if( value > m_root->value)
+                    att_altura(false);
+                else 
+                    att_altura(true);
+            }
+            if(flag)
+                return value;
+            return -1;
         }
         /// Retorna o nó caso esteja na arvora, e -1, caso contrario.
         bool busca(const T & value){
