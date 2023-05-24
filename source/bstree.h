@@ -95,12 +95,16 @@ class Tree{
         /// Retorna a posição do nó que contem a mediana da arvore. Se a arvore tiver um número par de nós, retorna o que tiver menor valor.
         int mediana(){
             int qtd = m_root->nodes_left + m_root->nodes_right + 1;
+            int n; //enesimo elemento que corresponde a mediana
             // Verifica se a quantidade de nós da arvore é impar ou par
             if(qtd % 2 == 0){
-                // Retornar o menor elemento entre os dois
-            } else {
 
+                n = int(floor(qtd/2));
+                
+            } else {
+                n = int(floor(qtd/2)) + 1;
             }
+            return enesimo_elemento(n);
         }
         /// Retorna a soma de todos os nós, a esquerda se direction = true, direita caso contrario, a partir da raiz.
         double soma(const Node * root, bool direction){
