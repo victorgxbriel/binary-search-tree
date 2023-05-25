@@ -61,20 +61,24 @@ class Tree{
         }
         /// Destrutor padrão.
         ~Tree(){
-            clear(m_root);
+            clear();
         }
-        /// Limpa a arvore, deixando apenas o nó raiz.
-        void clear(Node * root){
+        inline void aux_clear(Node * root){
             if(root == nullptr) return;
 
-            clear(root->right_son);
-            clear(root->left_son);
-            
-            delete root;
+            aux_clear(root->left_son);
+            aux_clear(root->right_son);
 
+            delete root;
+            root = nullptr;
+        }
+        /// Limpa a arvore, deixando apenas o nó raiz.
+        inline void clear(){
+            aux_clear(m_root);
+            m_root = nullptr;
         }
         /// Função auxlixar a enesimo.
-        int aux_enesimo_elemento(Node *root, int n){
+        inline int aux_enesimo_elemento(Node *root, int n){
             if((n > (root->nodes_left + root->nodes_right + 1)) || (n <= 0)){
                 return -1;
             }
@@ -99,7 +103,7 @@ class Tree{
         
         }
         /// Retorna o n-esimo elemento(contando a partir de 1) do percurso em ordem(ordem simetrica) da arvore, retorna -1 caso o n for maior que o número de nós da arvore.
-        int enesimo_elemento(int n){
+        inline int enesimo_elemento(int n){
             if(m_root != nullptr){
                 int enesimo = aux_enesimo_elemento(m_root, n);
                 return enesimo;
@@ -107,7 +111,7 @@ class Tree{
             return -1;
         }
         /// Funcao auxiliar a posicao.
-        int aux_posicao(const Node * root, const T & value){
+        inline int aux_posicao(const Node * root, const T & value){
             if(root == nullptr) return -1;
             if(root->value == value){
                 return root->nodes_left + 1;
@@ -128,7 +132,7 @@ class Tree{
             }
         }
         /// Retorna a posição do nó que contem o valor x em um percurso em ordem simetrica na arvore(contando a partir de 1), retorna -1 caso não esteja na arvore.
-        int posicao(const T & value){
+        inline int posicao(const T & value){
             int ret;
             if(m_root != nullptr)
                 ret = aux_posicao(m_root, value);
@@ -137,7 +141,7 @@ class Tree{
             return ret;
         }
         /// Retorna a posição do nó que contem a mediana da arvore. Se a arvore tiver um número par de nós, retorna o que tiver menor valor.
-        int mediana(){
+        inline int mediana(){
             int qtd = m_root->nodes_left + m_root->nodes_right + 1;
             int n; //enesimo elemento que corresponde a mediana
             // Verifica se a quantidade de nós da arvore é impar ou par
@@ -151,7 +155,7 @@ class Tree{
             return enesimo_elemento(n);
         }
         /// Retorna a soma de todos os nós, a esquerda se direction = true, direita caso contrario, a partir da raiz.
-        double soma(const Node * root, bool direction){
+        inline double soma(const Node * root, bool direction){
             if(root == nullptr){
                 return 0;
             }
@@ -163,13 +167,13 @@ class Tree{
 
         }
         /// Rertorna a media aritmetica dos valores dos nós da arvore tem como nó raiz o valor value, e -1 caso não contenha o valor na arvore.
-        double media(const T & value){
+        inline double media(const T & value){
             Node *var;
             if(m_root != nullptr){
                 var = m_root;
                 while(true){
                     if(var == nullptr)
-                        return -1;
+                        return -1.0;
                     if(var->value == value){
                         return (soma(var, false) + soma(var, true) - value) / (var->nodes_left + var->nodes_right + 1);
                     } else if(var->value > value){
@@ -181,7 +185,7 @@ class Tree{
             }
         }
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria cheia e falso, caso contrario.
-        bool eh_cheia(){
+        inline bool eh_cheia(){
             int qtd_nos = m_root->nodes_left + m_root->nodes_right + 1;
             int cheia_nos = std::pow(2, m_root->heigth) - 1;
             if(qtd_nos == cheia_nos)
@@ -189,7 +193,7 @@ class Tree{
             return false;
         }
         /// Retorna verdadeiro se a arvore for uma arvore de busca binaria completa e falso, caso contrario.
-        bool eh_completa(){
+        inline bool eh_completa(){
             int qtd_nos = m_root->nodes_left + m_root->nodes_right + 1;
             int min_nos = std::pow(2, m_root->heigth - 1);
             int max_nos = std::pow(2, m_root->heigth) - 1;
@@ -198,7 +202,7 @@ class Tree{
             return false;
         }
         /// Função auxiliar a preordem.
-        std::string aux_preordem(const Node * root){
+        inline std::string aux_preordem(const Node * root){
             if(!root) return "";
 
             setSeq_pre_ordem(getSeq_pre_ordem() + std::to_string(root->value) + " ");
@@ -208,7 +212,7 @@ class Tree{
             return getSeq_pre_ordem();
         }
         /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
-        std::string pre_ordem(){
+        inline std::string pre_ordem(){
             if(m_root != nullptr){
                 std::string ret = aux_preordem(m_root);
                 seq_pre_ordem.clear();
@@ -217,7 +221,7 @@ class Tree{
             return "";
         }
         /// Função auxiliar a imprime, na maneira 1.
-        std::string imprime1(const Node * root, int nivel, int largura){
+        inline std::string imprime1(const Node * root, int nivel, int largura){
             if(root == nullptr) return "";
             
             std::ostringstream oss;
@@ -230,7 +234,7 @@ class Tree{
 
         }
         /// Função auxiliar a imprime, na maneira 2.
-        std::string imprime2(const Node * root){
+        inline std::string imprime2(const Node * root){
             if(root == nullptr) return "";
 
             std::string str = "(" + std::to_string(root->value);
@@ -240,7 +244,7 @@ class Tree{
             return str;
         }
         /// Caso m = 1, imprime a arvore de acordo com o metodo 1, se m = 2, imprime a arvore de acordo com o metodo 2.
-        std::string imprime_arvore(int m){
+        inline std::string imprime_arvore(int m){
             if(m_root == nullptr) return "";
             std::string str;
             int qtd = m_root->heigth * 4;
@@ -254,7 +258,7 @@ class Tree{
             return str;
         }
         /// Função recursiva auxiliar a atualiza altura.
-        int altura(Node *& node){
+        inline int altura(Node *& node){
             if(node == nullptr)
                 return 0;
             if(node->right_son == nullptr and node->left_son == nullptr){
@@ -270,7 +274,7 @@ class Tree{
                 node->heigth = direita + 1;
             return node->heigth;
         }
-        void att_altura_completa(){
+        inline void att_altura_completa(){
             m_root->heigth_left = altura(m_root->left_son);
             m_root->heigth_rigth = altura(m_root->right_son);
 
@@ -280,7 +284,7 @@ class Tree{
                 m_root->heigth = m_root->heigth_rigth + 1;
         }
         /// Função para calcular a altura da arvore, true para esquerda, false para direita
-        void att_altura(bool dir){
+        inline void att_altura(bool dir){
             if(dir)
                 m_root->heigth_left = altura(m_root->left_son);
             else 
@@ -292,7 +296,7 @@ class Tree{
                 m_root->heigth = m_root->heigth_rigth + 1;
         }
         /// Função recursiva auxiliar a remoção
-        bool aux_remove(Node *& node, const T& value){
+        inline bool aux_remove(Node *& node, const T& value){
             if(node == nullptr){
                 return false;
             }
@@ -341,7 +345,7 @@ class Tree{
             }
         }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
-        int remove(const T & value){
+        inline int remove(const T & value){
             bool flag;
             if(m_root != nullptr){
                 Node * node = m_root;
@@ -360,7 +364,7 @@ class Tree{
             return -1;
         }
         /// Retorna o nó caso esteja na arvora, e -1, caso contrario.
-        bool busca(const T & value){
+        inline bool busca(const T & value){
             Node *var = new Node;
             // Verifica se a arvore é vazia
             if(m_root != nullptr){
@@ -380,7 +384,7 @@ class Tree{
             }
         }
         /// Função auxiliar a insert. Retorna true, caso a inserção for em sucessida, e false caso contrario(Valor já está na arvore).
-        bool var_insert(Node * root, Node * newnode, int & h, bool & att){
+        inline bool var_insert(Node * root, Node * newnode, int & h, bool & att){
             if(newnode->value == root->value){
                 return false;
             }
@@ -429,7 +433,7 @@ class Tree{
             }
         }
         /// Insere um nó na arvore com o valor passado, caso já esteja na arvore retorna -1.
-        int insert(const T & value){
+        inline int insert(const T & value){
             bool flag;
             Node *newnode = new Node;
             newnode->value = value;

@@ -38,7 +38,7 @@ void imprime_funcoes(){
               << "INSIRA N\n"
               << "Para mais informações, acesse o codigo fonte do arquivo \"tree.h\"\n"
               << "você pode voltar a ver o padrão acima digitando \"-help\",e para parar a execução \"-exit\"(apenas pelo console)\n"
-              << "Esse foi um trabalho academico feito por Victor Gabriel e Daniel Lucas\n";
+              << "Esse foi um trabalho academico feito por Victor Gabriel e Daniel Lucas\n\n";
 }
 
 std::vector<std::string> split(const std::string & input_str, char delimiter = ' '){
@@ -88,8 +88,7 @@ function_e what_function(const std::string & str){
         return function_e::ERRO;
 }
 
-auto result_function(function_e func, std::vector<std::string> comands, edb::Tree<int> & t, std::string & msg){
-    auto result = NULL;
+void result_function(function_e func, std::vector<std::string> comands, edb::Tree<int> & t, std::string & msg, int & result, double & media){
     switch(func){
         case function_e::ENESIMO:
             if(comands.size() != 2){
@@ -124,11 +123,11 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
                 msg = "Operação invalida, está faltando informação ou tem a mais";
             } else {
                 int value = std::stoi(comands[1]);
-                result = t.media(value);
-                if(result == -1)
+                media = t.media(value);
+                if(media == -1.0)
                     msg = "Não existe nó na arvore com o valor passado";
                 else
-                    msg = std::to_string(result);
+                    msg = std::to_string(media);
             }
             break;
         case function_e::CHEIA:
@@ -204,7 +203,6 @@ auto result_function(function_e func, std::vector<std::string> comands, edb::Tre
             msg = "Função não encontrada";
             break;
     }
-    return result;
 }
 
 void archive(std::string namefile, edb::Tree<int> & t, bool flag,std::string namefileout = "docs/saida.txt"){
@@ -214,7 +212,7 @@ void archive(std::string namefile, edb::Tree<int> & t, bool flag,std::string nam
     std::string msg;
 
     filein.open(namefile);
-    if(!flag)
+    if(flag == false)
         fileout.open(namefileout);
     if(filein.is_open()){
         while(std::getline(filein >> std::ws, line)){
@@ -223,8 +221,12 @@ void archive(std::string namefile, edb::Tree<int> & t, bool flag,std::string nam
             if(comands.empty())
                 continue;
             function_e func = what_function(comands[0]);
-            auto result = result_function(func, comands, t, msg);
-            if(!flag){
+            int x = 0;
+            int &result = x;
+            double y = 0.0;
+            double &media = y;
+            result_function(func, comands, t, msg, result, media);
+            if(flag == false){
                 if(fileout.is_open())
                     fileout << msg << std::endl;
                 else
@@ -236,7 +238,7 @@ void archive(std::string namefile, edb::Tree<int> & t, bool flag,std::string nam
     } else {
         std::cerr << "Erro ao abrir o arquivo de entrada\n";
     }
-    if(!flag)
+    if(flag == false)
         fileout.close();
     filein.close();
 }
@@ -271,13 +273,16 @@ void console(edb::Tree<int> & t){
     while(input != "-exit"){
         std::vector<std::string> comands = split(input);
         function_e func = what_function(comands[0]);
-        auto result = result_function(func, comands, t, msg);
+        int x = 0;
+        int & result = x;
+        double y = 0.0;
+        double & media = y;
+        result_function(func, comands, t, msg, result, media);
         std::cout << msg << std::endl;
         std::cout << "\nDigite a função: (-help para caso queira saber as funções)\n";
         std::getline(std::cin, input);
     }
 }
-
 
 int main(int argc, char **argv){
     edb::Tree<int> t;
@@ -297,18 +302,21 @@ int main(int argc, char **argv){
         filein = argv[2];
         arquivonos(nodes, t);
         if(argc == 4 ){
-            if(argv[3] == "-c")
+            std::string st = argv[3];
+            if(st == "-c")
                 archive(filein, t, true);
-            else
+            else{
                 archive(filein, t, false, argv[3]);
+                std::cout << "A saida do programa foi para o arquiv: " << argv[3] << std::endl;
+            }
         } else if( argc == 3){
             archive(filein, t, false);
+            std::cout << "A saida do programa foi para o arquivo: docs/saida.txt\n";
         } else {
             std::cout << "Entrada não aceita, execute de novo\n";
         }
     } else {
         console(t);
     }
-    t.~Tree();
     return 0;
 }
