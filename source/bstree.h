@@ -9,6 +9,21 @@
 
 #include <string>
 #include <cmath>
+#include <vector>
+#include <iomanip>
+#include <iostream>
+
+std::vector<std::string> splittree(const std::string & input_str, char delimiter = ' '){
+    std::vector<std::string> tokens;
+
+    std::istringstream iss;
+    iss.str(input_str);
+    std::string token;
+    while(std::getline(iss >> std::ws, token, delimiter)){
+        tokens.push_back(token);
+    }
+    return tokens;
+}
 
 namespace edb{
 /// Instancia de uma arvore de busca binaria.
@@ -46,15 +61,19 @@ class Tree{
         }
         /// Destrutor padrão.
         ~Tree(){
-            clear();
-            delete m_root;
+            clear(m_root);
         }
         /// Limpa a arvore, deixando apenas o nó raiz.
-        void clear(){
+        void clear(Node * root){
+            if(root == nullptr) return;
+
+            clear(root->right_son);
+            clear(root->left_son);
+            
+            delete root;
 
         }
-
-        /// Retorna o n-esimo elemento(contando a partir de 1) do percurso em ordem(ordem simetrica) da arvore, retorna -1 caso o n for maior que o número de nós da arvore.
+        /// Função auxlixar a enesimo.
         int aux_enesimo_elemento(Node *root, int n){
             if((n > (root->nodes_left + root->nodes_right + 1)) || (n <= 0)){
                 return -1;
@@ -79,7 +98,7 @@ class Tree{
             }
         
         }
-
+        /// Retorna o n-esimo elemento(contando a partir de 1) do percurso em ordem(ordem simetrica) da arvore, retorna -1 caso o n for maior que o número de nós da arvore.
         int enesimo_elemento(int n){
             if(m_root != nullptr){
                 int enesimo = aux_enesimo_elemento(m_root, n);
@@ -87,7 +106,6 @@ class Tree{
             }
             return -1;
         }
-
         /// Retorna a posição do nó que contem o valor x em um percurso em ordem simetrica na arvore(contando a partir de 1), retorna -1 caso não esteja na arvore.
         int posicao(const T & value){
             return 0;
@@ -153,7 +171,7 @@ class Tree{
                 return true;
             return false;
         }
-
+        /// Função auxiliar a preordem.
         std::string aux_preordem(const Node * root){
             if(!root) return "";
 
@@ -163,7 +181,7 @@ class Tree{
 
             return getSeq_pre_ordem();
         }
-
+        /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
         std::string pre_ordem(){
             if(m_root != nullptr){
                 std::string ret = aux_preordem(m_root);
@@ -172,11 +190,42 @@ class Tree{
             }
             return "";
         }
-        /// Retorna uma string que contém a sequencia de visitação(percorrimento) da arvore em pré-ordem.
-        
+        /// Função auxiliar a imprime, na maneira 1.
+        std::string imprime1(const Node * root, int nivel, int largura){
+            if(root == nullptr) return "";
+            
+            std::ostringstream oss;
+            int spaces = nivel * 4;
+            oss << std::setw(spaces) << std::setfill(' ') << "" << root->value << "" << std::setw(largura- spaces) << std::setfill('-') << "\n";
+            oss << imprime1(root->left_son, nivel + 1, largura);
+            oss << imprime1(root->right_son, nivel + 1, largura);
+
+            return oss.str();
+
+        }
+        /// Função auxiliar a imprime, na maneira 2.
+        std::string imprime2(const Node * root){
+            if(root == nullptr) return "";
+
+            std::string str = "(" + std::to_string(root->value);
+            str+= imprime2(root->left_son);
+            str+= imprime2(root->right_son);
+            str += ")";
+            return str;
+        }
         /// Caso m = 1, imprime a arvore de acordo com o metodo 1, se m = 2, imprime a arvore de acordo com o metodo 2.
         std::string imprime_arvore(int m){
-            return 0;
+            if(m_root == nullptr) return "";
+            std::string str;
+            int qtd = m_root->heigth * 4;
+            if(m == 1){
+                str = imprime1(m_root, 0, qtd);
+            } else if(m == 2){
+                str = imprime2(m_root);
+            } else {
+                return "";
+            }
+            return str;
         }
         /// Função recursiva auxiliar a atualiza altura.
         int altura(Node *& node){
@@ -222,36 +271,29 @@ class Tree{
                 return false;
             }
             if(value > node->value){
-                if(aux_remove(node->right_son, value)){
+                if(aux_remove(node->right_son, value))
                     node->nodes_right--;
-                    if(node->heigth_rigth < node->heigth_left)
-                        node->heigth = node->heigth_left + 1;
-                    else 
-                        node->heigth = node->heigth_rigth + 1;
-                }
             } else if(value < node->value){
-                if(aux_remove(node->left_son, value)){
+                if(aux_remove(node->left_son, value))
                     node->nodes_left--;
-                    if(node->heigth_left < node->heigth_rigth)
-                        node->heigth = node->heigth_rigth + 1;
-                    else
-                        node->heigth = node->heigth_left + 1;
-                }
             } else {
                 if(node->left_son == nullptr and node->right_son == nullptr){
                 // Caso 1 : folha
                     delete node;
                     node = nullptr;
+                    return true;
                 } else if(node->left_son == nullptr){
                 // Caso 2 : um filho a direita
                     Node * temp = node;
                     node = node->right_son;
                     delete temp;
+                    return true;
                 } else if(node->right_son == nullptr){
                 // Caso 2: um filho a esquerda
                     Node * temp = node;
                     node = node->left_son;
                     delete temp;
+                    return true;
                 } else {
                 // Caso 3: 2 filhos
                 // Procurar pelo menor da subarvore da direita, i.e., andar pra esquerda na sub arvore da direita
@@ -261,16 +303,16 @@ class Tree{
                         curr = minrigh; 
                         minrigh = minrigh->left_son;
                     }
-                    curr->value = minrigh->value;
-                    if(curr == node)
-                        node->right_son = minrigh->right_son;
-                    else
-                        node->left_son = minrigh->right_son;
-                    delete minrigh;
+                    int vvalue = minrigh->value;
+                    if(minrigh->right_son != nullptr)
+                        aux_remove(curr, minrigh->value);
+                    else 
+                        delete minrigh;
+                    m_root->value = vvalue;
+                    m_root->nodes_right--;
+                    return true;
                 }
             }
-            return true;
-            
         }
         /// Remove o nó da arvore cujo valor passado, caso não esteja na arvore retorna -1.
         int remove(const T & value){
@@ -281,7 +323,7 @@ class Tree{
             }
             if(flag and m_root != nullptr){
                 if(value == m_root->value)
-                    att_altura_completa();
+                    att_altura(false);
                 else if( value > m_root->value)
                     att_altura(false);
                 else 
@@ -355,8 +397,8 @@ class Tree{
                             root->heigth_left += h;
                         if(root->heigth_left > root->heigth_rigth)
                             root->heigth = root->heigth_left + h;
-                    }
                         root->nodes_left++;
+                    }
                 }
             }
         }

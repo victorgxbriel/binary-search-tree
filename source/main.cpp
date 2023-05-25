@@ -285,7 +285,9 @@ int main(int argc, char **argv){
              << "Implementamos dois jeitos para testar ela, você pode optar por testar no console, digitando as funções uma por vez, ou por arquivo.\n"
              << "Caso queira por arquivo, você deve passar ao menos 2 arquivos, o primeiro sendo os valores dos nós, em uma unica linha separado por ' ' .\n"
              << "O segundo sendo as funções, sendo uma por linha, e o terceiro sendo o de saida, que é opicional. Caso queira que a saida seja o console passe '-c'\n"
-             << "Exemplo: ./exec arquivonos.txt arquivofuncoes.txt -c arquivosaida.txt(opicional)\n"
+             << "Exemplos: ./exec arquivonos.txt arquivofuncoes.txt -c\n"
+             << "./exec arquivosnos.txt arquivosfuncoes.txt\n"
+             << "./exec arquivonos.txt arquivofuncoes.txt arquivosaida.txt\n"
              << "Em ambos os casos, deve seguir o padrão para chamada de funções, e cada um por vez(por linha, caso arquivo).\n"
              << "Segue abaixo o padrão das funções:\n";
              imprime_funcoes();
@@ -299,14 +301,14 @@ int main(int argc, char **argv){
                 archive(filein, t, true);
             else
                 archive(filein, t, false, argv[3]);
-        } else if( argc == 5){
-            if(argv[3] == "-c")
-                archive(filein, t, true, argv[4]);
-            else
-                archive(filein, t, false, argv[4]);
+        } else if( argc == 3){
+            archive(filein, t, false);
+        } else {
+            std::cout << "Entrada não aceita, execute de novo\n";
         }
     } else {
         console(t);
     }
+    t.~Tree();
     return 0;
 }
