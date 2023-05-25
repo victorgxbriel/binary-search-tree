@@ -106,9 +106,35 @@ class Tree{
             }
             return -1;
         }
+        /// Funcao auxiliar a posicao.
+        int aux_posicao(const Node * root, const T & value){
+            if(root == nullptr) return -1;
+            if(root->value == value){
+                return root->nodes_left + 1;
+            }
+            
+            if(root->value > value){
+                int ret1;
+                ret1 = aux_posicao(root->left_son, value);
+                if(ret1 == -1)
+                    ret1 = -1;
+                return ret1;
+            } else {
+                int ret2;
+                ret2 = aux_posicao(root->right_son, value) + root->nodes_left + 1;
+                if(ret2 == -1)
+                    ret2 = -1;
+                return ret2;
+            }
+        }
         /// Retorna a posição do nó que contem o valor x em um percurso em ordem simetrica na arvore(contando a partir de 1), retorna -1 caso não esteja na arvore.
         int posicao(const T & value){
-            return 0;
+            int ret;
+            if(m_root != nullptr)
+                ret = aux_posicao(m_root, value);
+            else
+                ret = -1;
+            return ret;
         }
         /// Retorna a posição do nó que contem a mediana da arvore. Se a arvore tiver um número par de nós, retorna o que tiver menor valor.
         int mediana(){
